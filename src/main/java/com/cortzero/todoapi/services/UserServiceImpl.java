@@ -4,10 +4,13 @@ import com.cortzero.todoapi.dtos.UpdateUserRequest;
 import com.cortzero.todoapi.dtos.UserDto;
 import com.cortzero.todoapi.entities.User;
 import com.cortzero.todoapi.exceptions.ResourceNotFoundException;
+import com.cortzero.todoapi.exceptions.UserEmailAlreadyExistsException;
 import com.cortzero.todoapi.repositories.UserRepository;
 import com.cortzero.todoapi.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,12 +21,34 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserDto updateCurrentUserInformation(UpdateUserRequest userRequest) {
-        return null;
+        String username = securityUtils.getCurrentUserUsername();
+        Optional<User> userOptional = userRepository.findByEmail(userRequest.getEmail());
+        if (userOptional.isPresent() && !userOptional.get().getUsername().equals(username)) {
+            throw new UserEmailAlreadyExistsException("The email '" + userRequest.getEmail() + "' is already taken.");
+        }
+        else {
+            return userRepository.findByUsername(username)
+                    .map(existingUser -> {
+                        existingUser.setFirstName(userRequest.getFirstName());
+                        existingUser.setLastName(userRequest.getLastName());
+                        existingUser.setEmail(userRequest.getEmail());
+                        userRepository.save(existingUser);
+                        return UserDto.builder()
+                                .firstName(existingUser.getFirstName())
+                                .lastName(existingUser.getLastName())
+                                .username(existingUser.getUsername())
+                                .email(existingUser.getEmail())
+                                .build();
+                    })
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            String.format(IUserService.USER_NOT_FOUND_MESSAGE, username))
+                    );
+        }
     }
 
     private User getByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User with username '" + username + "' was not found."));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(IUserService.USER_NOT_FOUND_MESSAGE, username)));
     }
 
     @Override

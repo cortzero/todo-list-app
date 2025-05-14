@@ -1,13 +1,12 @@
 package com.cortzero.todoapi.controllers;
 
+import com.cortzero.todoapi.dtos.UpdateUserRequest;
 import com.cortzero.todoapi.dtos.UserDto;
 import com.cortzero.todoapi.services.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -17,6 +16,13 @@ import java.util.Map;
 public class UserController {
 
     private final IUserService userService;
+
+    @PutMapping("account/update")
+    public ResponseEntity<Map<String, UserDto>> updateCurrentUserInformation(@RequestBody UpdateUserRequest requestBody) {
+        return new ResponseEntity<>(
+                Map.of("userUpdated", userService.updateCurrentUserInformation(requestBody)),
+                HttpStatus.OK);
+    }
 
     @GetMapping("account")
     public ResponseEntity<Map<String, UserDto>> getCurrentUserInformation() {
