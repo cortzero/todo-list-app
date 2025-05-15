@@ -22,6 +22,9 @@ public class ToDo {
     @NotBlank
     private String task;
 
+    @Column(name = "completed", nullable = false)
+    private boolean completed;
+
     @ManyToOne(cascade = CascadeType.REMOVE, optional = false)
     @JoinColumn(name = "user_id")
     private User user;
