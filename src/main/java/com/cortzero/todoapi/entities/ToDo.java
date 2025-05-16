@@ -33,4 +33,8 @@ public class ToDo {
         return user.getUsername();
     }
 
+    public void completeToDo() {
+        setCompleted(true);
+    }
+
 }
