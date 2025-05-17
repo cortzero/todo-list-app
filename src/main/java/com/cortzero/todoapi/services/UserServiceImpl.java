@@ -33,12 +33,7 @@ public class UserServiceImpl implements IUserService {
                         existingUser.setLastName(userRequest.getLastName());
                         existingUser.setEmail(userRequest.getEmail());
                         userRepository.save(existingUser);
-                        return UserDto.builder()
-                                .firstName(existingUser.getFirstName())
-                                .lastName(existingUser.getLastName())
-                                .username(existingUser.getUsername())
-                                .email(existingUser.getEmail())
-                                .build();
+                        return mapToDto(existingUser);
                     })
                     .orElseThrow(() -> new ResourceNotFoundException(
                             String.format(IUserService.USER_NOT_FOUND_MESSAGE, username))
@@ -48,18 +43,23 @@ public class UserServiceImpl implements IUserService {
 
     private User getByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(IUserService.USER_NOT_FOUND_MESSAGE, username)));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format(IUserService.USER_NOT_FOUND_MESSAGE, username)));
     }
 
     @Override
     public UserDto getCurrentUserInformation() {
         String username = securityUtils.getCurrentUserUsername();
         User loggedInUser = getByUsername(username);
+        return mapToDto(loggedInUser);
+    }
+
+    private UserDto mapToDto(User user) {
         return UserDto.builder()
-                .firstName(loggedInUser.getFirstName())
-                .lastName(loggedInUser.getLastName())
-                .username(loggedInUser.getUsername())
-                .email(loggedInUser.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .username(user.getUsername())
+                .email(user.getEmail())
                 .build();
     }
 }
