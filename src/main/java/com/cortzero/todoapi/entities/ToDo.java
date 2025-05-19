@@ -19,7 +19,7 @@ public class ToDo {
     private Long id;
 
     @Column(name = "task", nullable = false, columnDefinition = "text")
-    @NotBlank
+    @NotBlank(message = "The task attribute must not be empty or contain only whitespace characters.")
     private String task;
 
     @Column(name = "completed", nullable = false)
