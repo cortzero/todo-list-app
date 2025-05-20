@@ -11,6 +11,8 @@ import com.cortzero.todoapi.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ToDoServiceImpl implements IToDoService {
@@ -33,10 +35,22 @@ public class ToDoServiceImpl implements IToDoService {
         return mapToToDoDto(toDo);
     }
 
+    @Override
+    public List<ToDoDto> getAllToDosForCurrentUser() {
+        String username = securityUtils.getCurrentUserUsername();
+        User loggedInUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(IUserService.USER_NOT_FOUND_MESSAGE, username)));
+        List<ToDo> toDosForUser = toDoRepository.findByUser(loggedInUser);
+        return toDosForUser.stream()
+                .map(this::mapToToDoDto)
+                .toList();
+    }
+
     private ToDoDto mapToToDoDto(ToDo toDo) {
         return ToDoDto.builder()
                 .task(toDo.getTask())
                 .owner(toDo.getUser().getUsername())
                 .build();
     }
+
 }

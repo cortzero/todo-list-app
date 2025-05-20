@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,7 +42,7 @@ public class ToDoServiceImplTest {
         // Given
         CreateUpdateToDoDTO createUpdateToDoDTO = giveCreateUpdateToDoDTO();
         User user = giveUserEntity();
-        ToDo toDo = giveToDo(user);
+        ToDo toDo = giveToDo(user, "Do something");
 
         when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
@@ -71,6 +73,27 @@ public class ToDoServiceImplTest {
                 String.format(IUserService.USER_NOT_FOUND_MESSAGE, username));
     }
 
+    @Test
+    void givenValidAuthenticatedUser_whenGetAllToDosForCurrentUser_shouldReturnListOfToDoDTOs() {
+        // Given
+        User user = giveUserEntity();
+        List<ToDo> toDos = giveNToDosForCurrentUser(user, 3);
+
+        when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(toDoRepository.findByUser(user)).thenReturn(toDos);
+
+        // When
+        List<ToDoDto> toDoDTOs = toDoService.getAllToDosForCurrentUser();
+
+        // Then
+        assertNotNull(toDoDTOs);
+        assertEquals(3, toDoDTOs.size());
+        assertEquals("Do task 1", toDoDTOs.get(0).getTask());
+        assertEquals("Do task 2", toDoDTOs.get(1).getTask());
+        assertEquals("Do task 3", toDoDTOs.get(2).getTask());
+    }
+
     private CreateUpdateToDoDTO giveCreateUpdateToDoDTO() {
         return CreateUpdateToDoDTO.builder()
                 .task("Do something")
@@ -88,12 +111,20 @@ public class ToDoServiceImplTest {
                 .build();
     }
 
-    private ToDo giveToDo(User user) {
+    private ToDo giveToDo(User user, String task) {
         return ToDo.builder()
-                .task("Do something")
+                .task(task)
                 .completed(false)
                 .user(user)
                 .build();
+    }
+
+    private List<ToDo> giveNToDosForCurrentUser(User user, int n) {
+        List<ToDo> toDos = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            toDos.add(giveToDo(user, "Do task " + (i + 1)));
+        }
+        return toDos;
     }
 
 }
