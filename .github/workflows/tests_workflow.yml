@@ -1,8 +1,11 @@
-name: Tests workflow
+name: Run tests workflow
 
 on:
   push: 
-    branches: [master]
+    branches:
+      - feature/**
+      - release/**
+      - hotfix/**
 
 jobs:
   test:
