@@ -27,7 +27,7 @@ This is a REST API where registered users can create, view, edit, delete and che
 ### Installation
 1. Clone the repository.
 ```bash
-git clone https://github.com/cortzero/todo-list-app
+git clone https://github.com/cortzero/todo-list-app.git
 cd todo-list-app
 ```
 
