@@ -20,16 +20,16 @@ public class ToDoController {
     private final IToDoService toDoService;
 
     @PostMapping
-    public ResponseEntity<Map<String, ToDoDto>> createToDo(@RequestBody @Valid CreateUpdateToDoDTO createToDoDTO) {
+    public ResponseEntity<ToDoDto> createToDo(@RequestBody @Valid CreateUpdateToDoDTO createToDoDTO) {
         return new ResponseEntity<>(
-                Map.of("toDoCreated", toDoService.createToDoForCurrentUser(createToDoDTO)),
+                toDoService.createToDoForCurrentUser(createToDoDTO),
                 HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, List<ToDoDto>>> getAllToDos() {
+    public ResponseEntity<List<ToDoDto>> getAllToDos() {
         return new ResponseEntity<>(
-                Map.of("toDos", toDoService.getAllToDosForCurrentUser()),
+                toDoService.getAllToDosForCurrentUser(),
                 HttpStatus.OK);
     }
 
