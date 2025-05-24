@@ -52,8 +52,8 @@ public class ToDoControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(createUpdateToDoDTO)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.toDoCreated.task").value("Do something"))
-                .andExpect(jsonPath("$.toDoCreated.owner").value("testuser"));
+                .andExpect(jsonPath("$.task").value("Do something"))
+                .andExpect(jsonPath("$.owner").value("testuser"));
 
         verify(toDoService, times(1)).createToDoForCurrentUser(createUpdateToDoDTO);
     }
@@ -69,10 +69,10 @@ public class ToDoControllerTest {
         mockMvc.perform(get("/api/todos")
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.toDos.length()").value(3))
-                .andExpect(jsonPath("$.toDos[0].task").value("Do task 1"))
-                .andExpect(jsonPath("$.toDos[1].task").value("Do task 2"))
-                .andExpect(jsonPath("$.toDos[2].task").value("Do task 3"));
+                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$[0].task").value("Do task 1"))
+                .andExpect(jsonPath("$[1].task").value("Do task 2"))
+                .andExpect(jsonPath("$[2].task").value("Do task 3"));
     }
 
     private CreateUpdateToDoDTO giveCreatedUpdateToDoDTO(String task) {

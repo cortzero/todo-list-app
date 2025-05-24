@@ -60,9 +60,9 @@ public class UserControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updateUserRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userUpdated.firstName").value("First Name Updated"))
-                .andExpect(jsonPath("$.userUpdated.lastName").value("Last Name Updated"))
-                .andExpect(jsonPath("$.userUpdated.email").value("updated@example.com"));
+                .andExpect(jsonPath("$.firstName").value("First Name Updated"))
+                .andExpect(jsonPath("$.lastName").value("Last Name Updated"))
+                .andExpect(jsonPath("$.email").value("updated@example.com"));
 
         verify(userService, times(1)).updateCurrentUserInformation(any(UpdateUserRequest.class));
     }
@@ -84,9 +84,9 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/account")
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.user.firstName").value("First Name"))
-                .andExpect(jsonPath("$.user.lastName").value("Last Name"))
-                .andExpect(jsonPath("$.user.email").value("test@example.com"));
+                .andExpect(jsonPath("$.firstName").value("First Name"))
+                .andExpect(jsonPath("$.lastName").value("Last Name"))
+                .andExpect(jsonPath("$.email").value("test@example.com"));
     }
 
 }
