@@ -34,7 +34,10 @@ cd todo-list-app
 2. Set up environment variables.
 Create a `.env` file in the project root or set the following environment variables in your system:
 ```env
-DATABASE_URL=jdbc:postgresql://localhost:5432/todo_db
+SPRING_PROFILES_ACTIVE=dev
+DEV_DATABASE_URL=jdbc:postgresql://localhost:5432/to_do_db_dev
+TEST_DATABASE_URL=jdbc:postgresql://localhost:5432/to_do_db_test
+PROD_DATABASE_URL=jdbc:postgresql://localhost:5432/to_do_db_prod
 DATABASE_USERNAME=your_db_username
 DATABASE_PASSWORD=your_db_password
 ```
