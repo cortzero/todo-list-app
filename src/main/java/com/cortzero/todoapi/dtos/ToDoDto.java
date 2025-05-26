@@ -11,5 +11,6 @@ public class ToDoDto {
 
     private String task;
     private String owner;
+    private boolean complete;
 
 }

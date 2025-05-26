@@ -15,10 +15,27 @@ public class ToDoEntityTest {
     }
 
     @Test
-    void shouldUpdateCompletedStatus() {
-        ToDo toDo = ToDo.builder().task("Do homework").completed(false).build();
-        toDo.completeToDo();
-        assertTrue(toDo.isCompleted());
+    void givenToDoWithCompleteFieldSetToFalse_whenChangeStatus_shouldChangeCompleteFieldToTrue() {
+        // Given
+        ToDo toDo = ToDo.builder().task("Do homework").complete(false).build();
+
+        // When
+        toDo.changeStatus();
+
+        // Then
+        assertTrue(toDo.isComplete());
+    }
+
+    @Test
+    void givenToDoWithCompleteFieldSetToTrue_whenChangeStatus_shouldChangeCompleteFieldToFalse() {
+        // Given
+        ToDo toDo = ToDo.builder().task("Do homework").complete(true).build();
+
+        // When
+        toDo.changeStatus();
+
+        // Then
+        assertFalse(toDo.isComplete());
     }
 
 }

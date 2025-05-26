@@ -37,21 +37,21 @@ public class ToDoRepositoryTest {
 
         ToDo toDo1 = ToDo.builder()
                 .task("Do something")
-                .completed(false)
+                .complete(false)
                 .user(user)
                 .build();
         entityManager.persist(toDo1);
 
         ToDo toDo2 = ToDo.builder()
                 .task("Do something else")
-                .completed(false)
+                .complete(false)
                 .user(user)
                 .build();
         entityManager.persist(toDo2);
 
         ToDo toDo3 = ToDo.builder()
                 .task("Do another thing")
-                .completed(false)
+                .complete(false)
                 .user(user)
                 .build();
         entityManager.persist(toDo3);
