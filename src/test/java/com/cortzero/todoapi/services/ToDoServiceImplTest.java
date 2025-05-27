@@ -42,7 +42,7 @@ public class ToDoServiceImplTest {
         // Given
         CreateUpdateToDoDTO createUpdateToDoDTO = giveCreateUpdateToDoDTO();
         User user = giveUserEntity();
-        ToDo toDo = giveToDo(user, "Do something");
+        ToDo toDo = giveToDo(user, "Do something", false);
 
         when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
@@ -71,6 +71,46 @@ public class ToDoServiceImplTest {
                 ResourceNotFoundException.class,
                 () -> toDoService.createToDoForCurrentUser(createUpdateToDoDTO),
                 String.format(IUserService.USER_NOT_FOUND_MESSAGE, username));
+    }
+
+    @Test
+    void givenAuthenticatedUserAndIncompleteToDo_whenChangeToDoStatusForCurrentUser_shouldReturnDtoWithCompleteStatus() {
+        // Given
+        User user = giveUserEntity();
+        ToDo incompleteToDo = giveToDoWithId(1L, user, "Do something", false);
+        ToDo completeToDo = giveToDoWithId(1L, user, "Do something", true);
+
+        when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(toDoRepository.findByUserAndId(user, 1L)).thenReturn(Optional.of(incompleteToDo)); // has complete = false
+        when(toDoRepository.save(any(ToDo.class))).thenReturn(completeToDo); // has complete = true
+
+        // When
+        ToDoDto toDoDto = toDoService.changeToDoStatusForCurrentUser(1L);
+
+        // Then
+        assertNotNull(toDoDto);
+        assertTrue(toDoDto.isComplete());
+    }
+
+    @Test
+    void givenAuthenticatedUserAndCompleteToDo_whenChangeToDoStatusForCurrentUser_shouldReturnDtoWithIncompleteStatus() {
+        // Given
+        User user = giveUserEntity();
+        ToDo completeToDo = giveToDoWithId(1L, user, "Do something", true);
+        ToDo incompleteToDo = giveToDoWithId(1L, user, "Do something", false);
+
+        when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(toDoRepository.findByUserAndId(user, 1L)).thenReturn(Optional.of(completeToDo)); // has complete = true
+        when(toDoRepository.save(any(ToDo.class))).thenReturn(incompleteToDo); // has complete = false
+
+        // When
+        ToDoDto toDoDto = toDoService.changeToDoStatusForCurrentUser(1L);
+
+        // Then
+        assertNotNull(toDoDto);
+        assertFalse(toDoDto.isComplete());
     }
 
     @Test
@@ -111,10 +151,19 @@ public class ToDoServiceImplTest {
                 .build();
     }
 
-    private ToDo giveToDo(User user, String task) {
+    private ToDo giveToDo(User user, String task, boolean status) {
         return ToDo.builder()
                 .task(task)
-                .completed(false)
+                .complete(status)
+                .user(user)
+                .build();
+    }
+
+    private ToDo giveToDoWithId(Long id, User user, String task, boolean status) {
+        return ToDo.builder()
+                .id(id)
+                .task(task)
+                .complete(status)
                 .user(user)
                 .build();
     }
@@ -122,7 +171,7 @@ public class ToDoServiceImplTest {
     private List<ToDo> giveNToDosForCurrentUser(User user, int n) {
         List<ToDo> toDos = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            toDos.add(giveToDo(user, "Do task " + (i + 1)));
+            toDos.add(giveToDo(user, "Do task " + (i + 1), false));
         }
         return toDos;
     }

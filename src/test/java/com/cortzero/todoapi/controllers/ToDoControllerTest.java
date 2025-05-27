@@ -19,8 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,7 +42,7 @@ public class ToDoControllerTest {
     void givenAuthenticatedUserAndValidRequest_whenCreateToDo_shouldReturnOkAndCreatedToDoDTO() throws Exception {
         // Given
         CreateUpdateToDoDTO createUpdateToDoDTO = giveCreatedUpdateToDoDTO("Do something");
-        ToDoDto toDoDto = giveToDoDTO("Do something");
+        ToDoDto toDoDto = giveToDoDTO(1L, "Do something", false);
 
         when(toDoService.createToDoForCurrentUser(createUpdateToDoDTO)).thenReturn(toDoDto);
 
@@ -56,6 +55,23 @@ public class ToDoControllerTest {
                 .andExpect(jsonPath("$.owner").value("testuser"));
 
         verify(toDoService, times(1)).createToDoForCurrentUser(createUpdateToDoDTO);
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
+    void givenAuthenticatedUserAndIncompleteToDo_whenChangeToDoStatus_shouldReturnOkAndToDoDTOWithTrueValue() throws Exception {
+        // Given
+        ToDoDto toDoDto = giveToDoDTO(1L, "Do something", true);
+        when(toDoService.changeToDoStatusForCurrentUser(1L)).thenReturn(toDoDto);
+
+        // Then
+        mockMvc.perform(patch("/api/todos/1/status")
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.task").value("Do something"))
+                .andExpect(jsonPath("$.owner").value("testuser"))
+                .andExpect(jsonPath("$.complete").value(true));
     }
 
     @Test
@@ -81,17 +97,19 @@ public class ToDoControllerTest {
                 .build();
     }
 
-    private ToDoDto giveToDoDTO(String task) {
+    private ToDoDto giveToDoDTO(Long id, String task, boolean status) {
         return ToDoDto.builder()
+                .id(id)
                 .task(task)
                 .owner("testuser")
+                .complete(status)
                 .build();
     }
 
     private List<ToDoDto> giveNToDoDTOs(int n) {
         List<ToDoDto> toDoDTOs = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            toDoDTOs.add(giveToDoDTO("Do task " + (i + 1)));
+            toDoDTOs.add(giveToDoDTO((long) (i + 1) , "Do task " + (i + 1), false));
         }
         return toDoDTOs;
     }

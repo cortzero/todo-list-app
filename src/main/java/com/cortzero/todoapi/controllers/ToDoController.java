@@ -26,6 +26,11 @@ public class ToDoController {
                 HttpStatus.CREATED);
     }
 
+    @PatchMapping("{toDoId}/status")
+    public ResponseEntity<ToDoDto> changeToDoStatus(@PathVariable Long toDoId) {
+        return ResponseEntity.ok(toDoService.changeToDoStatusForCurrentUser(toDoId));
+    }
+
     @GetMapping
     public ResponseEntity<List<ToDoDto>> getAllToDos() {
         return new ResponseEntity<>(
