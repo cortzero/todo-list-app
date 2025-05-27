@@ -9,15 +9,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 public class ToDoRepositoryTest {
-
-    @Autowired
-    private TestEntityManager entityManager;
 
     @Autowired
     private ToDoRepository toDoRepository;
@@ -27,34 +24,38 @@ public class ToDoRepositoryTest {
     @BeforeEach
     void setup() {
         user = User.builder()
+                .id(1L)
                 .firstName("Test")
                 .lastName("User")
                 .username("testuser")
                 .email("test@example.com")
                 .password("123")
                 .build();
-        entityManager.persist(user);
+    }
 
-        ToDo toDo1 = ToDo.builder()
-                .task("Do something")
-                .complete(false)
-                .user(user)
-                .build();
-        entityManager.persist(toDo1);
+    @Test
+    void givenValidToDoId_whenFindByUserAndId_shouldReturnToDoBelongingToUserAndWithGivenId() {
+        // Given
+        Long toDoId = 1L;
 
-        ToDo toDo2 = ToDo.builder()
-                .task("Do something else")
-                .complete(false)
-                .user(user)
-                .build();
-        entityManager.persist(toDo2);
+        // When
+        Optional<ToDo> toDoAssociatedWithUser = toDoRepository.findByUserAndId(user, toDoId);
 
-        ToDo toDo3 = ToDo.builder()
-                .task("Do another thing")
-                .complete(false)
-                .user(user)
-                .build();
-        entityManager.persist(toDo3);
+        // Then
+        assertTrue(toDoAssociatedWithUser.isPresent());
+        assertEquals("Do something", toDoAssociatedWithUser.get().getTask());
+    }
+
+    @Test
+    void givenNonExistingToDoId_whenFindByUserAndId_shouldReturnEmptyOptional() {
+        // Given
+        Long toDoId = 1000L;
+
+        // When
+        Optional<ToDo> toDoAssociatedWithUser = toDoRepository.findByUserAndId(user, toDoId);
+
+        // Then
+        assertTrue(toDoAssociatedWithUser.isEmpty());
     }
 
     @Test

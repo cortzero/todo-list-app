@@ -47,6 +47,17 @@ public class ToDoServiceImpl implements IToDoService {
     }
 
     @Override
+    public ToDoDto updateToDoForCurrentUser(Long toDoId, CreateUpdateToDoDTO updateToDoDTO) {
+        String username = securityUtils.getCurrentUserUsername();
+        User loggedInUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(IUserService.USER_NOT_FOUND_MESSAGE, username)));
+        ToDo toDo = toDoRepository.findByUserAndId(loggedInUser, toDoId)
+                .orElseThrow(() -> new ResourceNotFoundException("The To-Do was not found."));
+        toDo.setTask(updateToDoDTO.getTask());
+        return mapToToDoDto(toDoRepository.save(toDo));
+    }
+
+    @Override
     public List<ToDoDto> getAllToDosForCurrentUser() {
         String username = securityUtils.getCurrentUserUsername();
         User loggedInUser = userRepository.findByUsername(username)
