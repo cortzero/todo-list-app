@@ -59,6 +59,7 @@ public class ToDoServiceImpl implements IToDoService {
 
     private ToDoDto mapToToDoDto(ToDo toDo) {
         return ToDoDto.builder()
+                .id(toDo.getId())
                 .task(toDo.getTask())
                 .owner(toDo.getUser().getUsername())
                 .complete(toDo.isComplete())

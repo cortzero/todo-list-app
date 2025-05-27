@@ -9,6 +9,7 @@ import lombok.Data;
 @Builder
 public class ToDoDto {
 
+    private Long id;
     private String task;
     private String owner;
     private boolean complete;
