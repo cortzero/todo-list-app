@@ -4,6 +4,7 @@ import com.cortzero.todoapi.dtos.CreateUpdateToDoDTO;
 import com.cortzero.todoapi.dtos.ToDoDto;
 import com.cortzero.todoapi.security.SecurityConfiguration;
 import com.cortzero.todoapi.services.IToDoService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,23 @@ public class ToDoControllerTest {
                 .andExpect(jsonPath("$.task").value("Do something"))
                 .andExpect(jsonPath("$.owner").value("testuser"))
                 .andExpect(jsonPath("$.complete").value(true));
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
+    void givenAuthenticatedUser_whenUpdateToDo_shouldReturnOkAndUpdatedToDoDTO() throws Exception {
+        //Given
+        CreateUpdateToDoDTO updateToDoDTO = giveCreatedUpdateToDoDTO("Do new things");
+        ToDoDto updatedToDoDTO = giveToDoDTO(1L, "Do new things", false);
+
+        when(toDoService.updateToDoForCurrentUser(1L, updateToDoDTO)).thenReturn(updatedToDoDTO);
+
+        // Then
+        mockMvc.perform(put("/api/todos/1")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updatedToDoDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.task").value("Do new things"));
     }
 
     @Test

@@ -31,6 +31,11 @@ public class ToDoController {
         return ResponseEntity.ok(toDoService.changeToDoStatusForCurrentUser(toDoId));
     }
 
+    @PutMapping("{toDoId}")
+    public ResponseEntity<ToDoDto> updateToDo(@PathVariable Long toDoId, @RequestBody @Valid CreateUpdateToDoDTO createUpdateToDoDTO) {
+        return ResponseEntity.ok(toDoService.updateToDoForCurrentUser(toDoId, createUpdateToDoDTO));
+    }
+
     @GetMapping
     public ResponseEntity<List<ToDoDto>> getAllToDos() {
         return new ResponseEntity<>(
