@@ -134,6 +134,46 @@ public class ToDoServiceImplTest {
         assertEquals("Do task 3", toDoDTOs.get(2).getTask());
     }
 
+    @Test
+    void givenValidAuthenticatedUser_whenUpdateToDoForCurrentUser_shouldReturnUpdatedToDoDTO() {
+        // Given
+        User user = giveUserEntity();
+        ToDo toDo = giveToDoWithId(1L, user, "Do something", false);
+        ToDo toDoUpdated = giveToDoWithId(1L, user, "New things to do", false);
+        CreateUpdateToDoDTO updateToDoDTO = CreateUpdateToDoDTO.builder()
+                .task("New things to do")
+                .build();
+
+        when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(toDoRepository.findByUserAndId(user, 1L)).thenReturn(Optional.of(toDo));
+        when(toDoRepository.save(any(ToDo.class))).thenReturn(toDoUpdated);
+
+        // When
+        ToDoDto toDoDto = toDoService.updateToDoForCurrentUser(1L, updateToDoDTO);
+
+        // Then
+        assertNotNull(toDoDto);
+        assertEquals("New things to do", toDoDto.getTask());
+    }
+
+    @Test
+    void givenNonExistingToDo_whenUpdateToDoForCurrentUser_shouldThrowResourceNotFoundException() {
+        // Given
+        User user = giveUserEntity();
+        CreateUpdateToDoDTO updateToDoDTO = CreateUpdateToDoDTO.builder()
+                .task("New things to do")
+                .build();
+
+        when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(toDoRepository.findByUserAndId(user, 1L)).thenReturn(Optional.empty());
+
+        // Then
+        assertThrows(ResourceNotFoundException.class,
+                () -> toDoService.updateToDoForCurrentUser(1L, updateToDoDTO));
+    }
+
     private CreateUpdateToDoDTO giveCreateUpdateToDoDTO() {
         return CreateUpdateToDoDTO.builder()
                 .task("Do something")

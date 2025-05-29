@@ -21,20 +21,11 @@ public class UserRepositoryTest {
 
     private String username;
     private String email;
-    private User user;
 
     @BeforeEach
     void setup() {
         username = "testuser";
         email = "test@example.com";
-        user = User.builder()
-                .firstName("Test")
-                .lastName("User")
-                .username(username)
-                .email(email)
-                .password("123")
-                .build();
-        entityManager.persist(user);
     }
 
     @Test
