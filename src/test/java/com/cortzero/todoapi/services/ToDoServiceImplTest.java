@@ -174,6 +174,17 @@ public class ToDoServiceImplTest {
                 () -> toDoService.updateToDoForCurrentUser(1L, updateToDoDTO));
     }
 
+    @Test
+    void givenValidAuthenticatedUser_whenDeleteToDoForCurrentUser_shouldDeleteToDoFromDatabase() {
+        // Given
+        User user = giveUserEntity();
+        when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+
+        // Then
+        assertDoesNotThrow(() -> toDoService.deleteToDoForCurrentUser(1L));
+    }
+
     private CreateUpdateToDoDTO giveCreateUpdateToDoDTO() {
         return CreateUpdateToDoDTO.builder()
                 .task("Do something")

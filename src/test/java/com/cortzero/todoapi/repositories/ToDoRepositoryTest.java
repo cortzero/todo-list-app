@@ -71,4 +71,16 @@ public class ToDoRepositoryTest {
         assertEquals("Do another thing", toDosCurrentUser.get(2).getTask());
     }
 
+    @Test
+    void givenValidUser_whenDeleteByUserAndId_shouldDeleteTheCurrentUserToDoFromTheDatabase() {
+        // When
+        toDoRepository.deleteByUserAndId(user, 3L);
+
+        // Then
+        List<ToDo> toDosCurrentUser = toDoRepository.findByUser(user);
+        assertEquals(2, toDosCurrentUser.size());
+        assertEquals("Do something", toDosCurrentUser.get(0).getTask());
+        assertEquals("Do something else", toDosCurrentUser.get(1).getTask());
+    }
+
 }
