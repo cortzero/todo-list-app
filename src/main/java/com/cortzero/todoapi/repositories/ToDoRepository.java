@@ -2,6 +2,7 @@ package com.cortzero.todoapi.repositories;
 
 import com.cortzero.todoapi.entities.ToDo;
 import com.cortzero.todoapi.entities.User;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,7 @@ public interface ToDoRepository extends JpaRepository<ToDo, Long> {
     List<ToDo> findByUser(User user);
 
     @Modifying
+    @Transactional
     @Query("delete from ToDo t where t.user = ?1 and id = ?2")
     void deleteByUserAndId(User user, Long id);
 

@@ -94,6 +94,15 @@ public class ToDoControllerTest {
 
     @Test
     @WithMockUser(username = "testuser")
+    void givenAuthenticatedUser_whenDeleteToDo_shouldReturnOkWithNoContent() throws Exception {
+        // Then
+        mockMvc.perform(delete("/api/todos/1")
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
     void givenAuthenticatedUser_whenGetAllToDos_shouldReturnOkAndListOfToDoDTOs() throws Exception {
         // Given
         List<ToDoDto> toDoDTOs = giveNToDoDTOs(3);
