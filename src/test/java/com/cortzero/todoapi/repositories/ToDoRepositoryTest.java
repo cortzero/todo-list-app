@@ -3,6 +3,7 @@ package com.cortzero.todoapi.repositories;
 import com.cortzero.todoapi.entities.ToDo;
 import com.cortzero.todoapi.entities.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -34,6 +35,7 @@ public class ToDoRepositoryTest {
     }
 
     @Test
+    @DisplayName("Test finding a To-Do by its owner and its id given an existing user and To-Do id")
     void givenValidToDoId_whenFindByUserAndId_shouldReturnToDoBelongingToUserAndWithGivenId() {
         // Given
         Long toDoId = 1L;
@@ -47,6 +49,7 @@ public class ToDoRepositoryTest {
     }
 
     @Test
+    @DisplayName("Test finding a To-Do by its owner and its id given an existing user but a non-existing To-Do id")
     void givenNonExistingToDoId_whenFindByUserAndId_shouldReturnEmptyOptional() {
         // Given
         Long toDoId = 1000L;
@@ -59,6 +62,7 @@ public class ToDoRepositoryTest {
     }
 
     @Test
+    @DisplayName("Test finding a To-Do by its owner given an existing user")
     void givenValidUser_whenFindByUser_shouldReturnListOfToDos() {
         // When
         List<ToDo> toDosCurrentUser = toDoRepository.findByUser(user);
@@ -72,6 +76,7 @@ public class ToDoRepositoryTest {
     }
 
     @Test
+    @DisplayName("Test deleting a To-Do by its owner and its id given an existing user and To-Do id")
     void givenValidUser_whenDeleteByUserAndId_shouldDeleteTheCurrentUserToDoFromTheDatabase() {
         // When
         toDoRepository.deleteByUserAndId(user, 3L);

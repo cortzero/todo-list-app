@@ -8,6 +8,7 @@ import com.cortzero.todoapi.exceptions.ResourceNotFoundException;
 import com.cortzero.todoapi.repositories.ToDoRepository;
 import com.cortzero.todoapi.repositories.UserRepository;
 import com.cortzero.todoapi.security.SecurityUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,6 +39,7 @@ public class ToDoServiceImplTest {
     private ToDoServiceImpl toDoService;
 
     @Test
+    @DisplayName("Test creating a To-Do task given an authenticated user")
     void givenValidAuthenticatedUser_whenCreateToDoForCurrentUser_shouldSaveToDoAndReturnDTO() {
         // Given
         CreateUpdateToDoDTO createUpdateToDoDTO = giveCreateUpdateToDoDTO();
@@ -58,6 +60,7 @@ public class ToDoServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test creating a To-Do task given a non-existing authenticated user")
     void givenNonExistingUser_whenCreateToDoForCurrentUser_shouldThrowAnException() {
         // Given
         CreateUpdateToDoDTO createUpdateToDoDTO = giveCreateUpdateToDoDTO();
@@ -74,6 +77,7 @@ public class ToDoServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test changing a To-Do task incomplete status to complete given an authenticated user")
     void givenAuthenticatedUserAndIncompleteToDo_whenChangeToDoStatusForCurrentUser_shouldReturnDtoWithCompleteStatus() {
         // Given
         User user = giveUserEntity();
@@ -94,6 +98,7 @@ public class ToDoServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test changing a To-Do task complete status to incomplete given an authenticated user")
     void givenAuthenticatedUserAndCompleteToDo_whenChangeToDoStatusForCurrentUser_shouldReturnDtoWithIncompleteStatus() {
         // Given
         User user = giveUserEntity();
@@ -114,6 +119,7 @@ public class ToDoServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test getting all To-Do tasks given an authenticated user")
     void givenValidAuthenticatedUser_whenGetAllToDosForCurrentUser_shouldReturnListOfToDoDTOs() {
         // Given
         User user = giveUserEntity();
@@ -135,6 +141,7 @@ public class ToDoServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test updating a To-Do task given an authenticated user")
     void givenValidAuthenticatedUser_whenUpdateToDoForCurrentUser_shouldReturnUpdatedToDoDTO() {
         // Given
         User user = giveUserEntity();
@@ -158,6 +165,7 @@ public class ToDoServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test updating a To-Do task given an authenticated user but non-existing To-Do task")
     void givenNonExistingToDo_whenUpdateToDoForCurrentUser_shouldThrowResourceNotFoundException() {
         // Given
         User user = giveUserEntity();
@@ -175,6 +183,7 @@ public class ToDoServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test deleting a To-Do task given an authenticated user")
     void givenValidAuthenticatedUser_whenDeleteToDoForCurrentUser_shouldDeleteToDoFromDatabase() {
         // Given
         User user = giveUserEntity();
