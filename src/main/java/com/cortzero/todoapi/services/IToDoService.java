@@ -10,7 +10,7 @@ public interface IToDoService {
     ToDoDto createToDoForCurrentUser(CreateUpdateToDoDTO createToDoDTO);
     ToDoDto changeToDoStatusForCurrentUser(Long toDoId);
     ToDoDto updateToDoForCurrentUser(Long toDoId, CreateUpdateToDoDTO updateToDoDTO);
-//    void deleteToDoForCurrentUser(Long toDoId);
+    void deleteToDoForCurrentUser(Long toDoId);
     List<ToDoDto> getAllToDosForCurrentUser();
 
 }

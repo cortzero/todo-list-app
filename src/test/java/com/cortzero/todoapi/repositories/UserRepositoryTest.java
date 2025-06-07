@@ -3,6 +3,7 @@ package com.cortzero.todoapi.repositories;
 import static org.junit.jupiter.api.Assertions.*;
 import com.cortzero.todoapi.entities.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -29,6 +30,7 @@ public class UserRepositoryTest {
     }
 
     @Test
+    @DisplayName("Test finding a user by its username")
     void givenUsername_whenFindByUsername_shouldReturnOptionalWithUser() {
         //When
         Optional<User> foundUser = userRepository.findByUsername(username);
@@ -42,6 +44,7 @@ public class UserRepositoryTest {
     }
 
     @Test
+    @DisplayName("Test finding a user by its email")
     void givenEmail_whenFindByEmail_shouldReturnOptionalWithUser() {
         // When
         Optional<User> foundUser = userRepository.findByEmail(email);

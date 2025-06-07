@@ -7,6 +7,7 @@ import com.cortzero.todoapi.exceptions.ResourceNotFoundException;
 import com.cortzero.todoapi.exceptions.UserEmailAlreadyExistsException;
 import com.cortzero.todoapi.repositories.UserRepository;
 import com.cortzero.todoapi.security.SecurityUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,6 +33,7 @@ public class UserServiceImplTest {
     private UserServiceImpl userService;
 
     @Test
+    @DisplayName("Test updating user information given authenticated user and valid input")
     void givenExistingAuthenticatedUserAndValidRequest_whenUpdateCurrentUserInformation_updatesAndReturnsDto() {
         // Given
         UpdateUserRequest updateUserRequest = UpdateUserRequest.builder()
@@ -77,6 +79,7 @@ public class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test updating user information given authenticated user and invalid input with repeated email")
     void givenExistingAuthenticatedUserAndRepeatedEmail_whenUpdateCurrentUserInformation_shouldThrowException() {
         // Given
         String username = "testuser";
@@ -106,6 +109,7 @@ public class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test updating user information given non existing user")
     void givenNonExistingAuthenticatedUser_whenUpdateCurrentUserInformation_shouldThrowException() {
         // Given
         String username = "testuser";
@@ -127,6 +131,7 @@ public class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test getting user information given existing authenticated user")
     void givenExistingAuthenticatedUser_whenGetCurrentUserInformation_shouldReturnUserDto() {
         // Given
         String username = "testuser";
@@ -154,6 +159,7 @@ public class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test getting user information given non existing authenticated user")
     void givenNonExistingAuthenticatedUser_whenGetCurrentUserInformation_shouldThrowException() {
         // Given
         String username = "testuser";

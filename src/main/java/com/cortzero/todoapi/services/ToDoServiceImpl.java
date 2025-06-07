@@ -58,6 +58,14 @@ public class ToDoServiceImpl implements IToDoService {
     }
 
     @Override
+    public void deleteToDoForCurrentUser(Long toDoId) {
+        String username = securityUtils.getCurrentUserUsername();
+        User loggedInUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(IUserService.USER_NOT_FOUND_MESSAGE, username)));
+        toDoRepository.deleteByUserAndId(loggedInUser, toDoId);
+    }
+
+    @Override
     public List<ToDoDto> getAllToDosForCurrentUser() {
         String username = securityUtils.getCurrentUserUsername();
         User loggedInUser = userRepository.findByUsername(username)

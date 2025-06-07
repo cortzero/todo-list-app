@@ -36,6 +36,12 @@ public class ToDoController {
         return ResponseEntity.ok(toDoService.updateToDoForCurrentUser(toDoId, createUpdateToDoDTO));
     }
 
+    @DeleteMapping("{toDoId}")
+    public ResponseEntity<Void> deleteToDo(@PathVariable Long toDoId) {
+        toDoService.deleteToDoForCurrentUser(toDoId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping
     public ResponseEntity<List<ToDoDto>> getAllToDos() {
         return new ResponseEntity<>(
