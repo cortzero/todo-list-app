@@ -5,6 +5,7 @@ import com.cortzero.todoapi.dtos.UserDto;
 import com.cortzero.todoapi.security.SecurityConfiguration;
 import com.cortzero.todoapi.services.IUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -38,6 +39,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(username = "testuser")
+    @DisplayName("Test updating current user information endpoint")
     void givenAuthenticatedUserAndValidRequest_whenUpdateCurrentUserInformation_returnsOkAndUpdatedUser() throws Exception {
         // Given
         UpdateUserRequest updateUserRequest = UpdateUserRequest.builder()
@@ -69,6 +71,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(username = "testuser")
+    @DisplayName("Test getting current user information endpoint")
     void givenAuthenticatedUser_whenGetCurrentUserInformation__returnsOkAndCurrentUser() throws Exception {
         // Given
         UserDto userDto = UserDto.builder()
