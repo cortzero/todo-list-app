@@ -6,6 +6,7 @@ import com.cortzero.todoapi.security.SecurityConfiguration;
 import com.cortzero.todoapi.services.IToDoService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -40,6 +41,7 @@ public class ToDoControllerTest {
 
     @Test
     @WithMockUser(username = "testuser")
+    @DisplayName("Test creating To-Do endpoint")
     void givenAuthenticatedUserAndValidRequest_whenCreateToDo_shouldReturnOkAndCreatedToDoDTO() throws Exception {
         // Given
         CreateUpdateToDoDTO createUpdateToDoDTO = giveCreatedUpdateToDoDTO("Do something");
@@ -60,6 +62,7 @@ public class ToDoControllerTest {
 
     @Test
     @WithMockUser(username = "testuser")
+    @DisplayName("Test changing To-Do incomplete status to complete status endpoint")
     void givenAuthenticatedUserAndIncompleteToDo_whenChangeToDoStatus_shouldReturnOkAndToDoDTOWithTrueValue() throws Exception {
         // Given
         ToDoDto toDoDto = giveToDoDTO(1L, "Do something", true);
@@ -77,6 +80,7 @@ public class ToDoControllerTest {
 
     @Test
     @WithMockUser(username = "testuser")
+    @DisplayName("Test updating To-Do endpoint")
     void givenAuthenticatedUser_whenUpdateToDo_shouldReturnOkAndUpdatedToDoDTO() throws Exception {
         //Given
         CreateUpdateToDoDTO updateToDoDTO = giveCreatedUpdateToDoDTO("Do new things");
@@ -94,6 +98,17 @@ public class ToDoControllerTest {
 
     @Test
     @WithMockUser(username = "testuser")
+    @DisplayName("Test deleting To-Do endpoint")
+    void givenAuthenticatedUser_whenDeleteToDo_shouldReturnOkWithNoContent() throws Exception {
+        // Then
+        mockMvc.perform(delete("/api/todos/1")
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
+    @DisplayName("Test getting all To-Do tasks for current user endpoint")
     void givenAuthenticatedUser_whenGetAllToDos_shouldReturnOkAndListOfToDoDTOs() throws Exception {
         // Given
         List<ToDoDto> toDoDTOs = giveNToDoDTOs(3);
