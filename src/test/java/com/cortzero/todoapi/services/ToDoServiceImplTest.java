@@ -187,11 +187,27 @@ public class ToDoServiceImplTest {
     void givenValidAuthenticatedUser_whenDeleteToDoForCurrentUser_shouldDeleteToDoFromDatabase() {
         // Given
         User user = giveUserEntity();
+        ToDo toDoToDelete = giveToDoWithId(1L, user, "Old task", false);
         when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(toDoRepository.findByUserAndId(user, 1L)).thenReturn(Optional.of(toDoToDelete));
 
         // Then
         assertDoesNotThrow(() -> toDoService.deleteToDoForCurrentUser(1L));
+    }
+
+    @Test
+    @DisplayName("Test deleting a To-Do task given an authenticated user and a non-existing To-Do")
+    void givenValidAuthenticatedUserAndNonExistingToDo_whenDeleteToDoForCurrentUser_shouldThrowResourceNotFoundException() {
+        // Given
+        User user = giveUserEntity();
+        ToDo toDoToDelete = giveToDoWithId(1L, user, "Old task", false);
+        when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(toDoRepository.findByUserAndId(user, 1L)).thenReturn(Optional.empty());
+
+        // Then
+        assertThrows(ResourceNotFoundException.class, () -> toDoService.deleteToDoForCurrentUser(1L));
     }
 
     private CreateUpdateToDoDTO giveCreateUpdateToDoDTO() {

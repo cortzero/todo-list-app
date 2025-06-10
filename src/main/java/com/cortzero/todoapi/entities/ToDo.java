@@ -25,7 +25,7 @@ public class ToDo {
     @Column(name = "complete", nullable = false)
     private boolean complete;
 
-    @ManyToOne(cascade = CascadeType.REMOVE, optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private User user;
 

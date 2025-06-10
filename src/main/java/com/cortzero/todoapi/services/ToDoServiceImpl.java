@@ -62,7 +62,12 @@ public class ToDoServiceImpl implements IToDoService {
         String username = securityUtils.getCurrentUserUsername();
         User loggedInUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(IUserService.USER_NOT_FOUND_MESSAGE, username)));
-        toDoRepository.deleteByUserAndId(loggedInUser, toDoId);
+        toDoRepository.findByUserAndId(loggedInUser, toDoId)
+                        .ifPresentOrElse(
+                                toDoRepository::delete,
+                                () -> {
+                                    throw new ResourceNotFoundException("The To-Do was not found,");
+                                });
     }
 
     @Override
