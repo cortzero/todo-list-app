@@ -22,10 +22,10 @@ public class ToDo {
     @NotBlank(message = "The task attribute must not be empty or contain only whitespace characters.")
     private String task;
 
-    @Column(name = "completed", nullable = false)
-    private boolean completed;
+    @Column(name = "complete", nullable = false)
+    private boolean complete;
 
-    @ManyToOne(cascade = CascadeType.REMOVE, optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -33,8 +33,13 @@ public class ToDo {
         return user.getUsername();
     }
 
-    public void completeToDo() {
-        setCompleted(true);
+    public void changeStatus() {
+        if (complete) {
+            setComplete(false);
+        }
+        else {
+            setComplete(true);
+        }
     }
 
 }

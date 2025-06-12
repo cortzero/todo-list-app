@@ -18,5 +18,10 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+    - name: Creating .env file
+      run: |
+        touch .env
+        echo SPRING_PROFILES_ACTIVE=${{ vars.SPRING_PROFILES_ACTIVE }} >> .env
+        cat .env
     - name: Running tests with Maven
       run: mvn test

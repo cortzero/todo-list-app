@@ -21,9 +21,9 @@ public class AuthenticationController {
     private final IAuthenticationService authenticationService;
 
     @PostMapping("signup")
-    public ResponseEntity<Map<String, UserDto>> registerUser(@RequestBody CreateUserRequest requestBody) {
+    public ResponseEntity<UserDto> registerUser(@RequestBody CreateUserRequest requestBody) {
         return new ResponseEntity<>(
-                Map.of("userCreated", authenticationService.createUser(requestBody)),
+                authenticationService.createUser(requestBody),
                 HttpStatus.CREATED);
     }
 

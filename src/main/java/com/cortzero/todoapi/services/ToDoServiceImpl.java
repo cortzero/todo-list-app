@@ -28,11 +28,46 @@ public class ToDoServiceImpl implements IToDoService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(IUserService.USER_NOT_FOUND_MESSAGE, username)));
         ToDo toDo = ToDo.builder()
                 .task(createToDoDTO.getTask())
-                .completed(false)
+                .complete(false)
                 .user(loggedInUser)
                 .build();
         toDoRepository.save(toDo);
         return mapToToDoDto(toDo);
+    }
+
+    @Override
+    public ToDoDto changeToDoStatusForCurrentUser(Long toDoId) {
+        String username = securityUtils.getCurrentUserUsername();
+        User loggedInUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(IUserService.USER_NOT_FOUND_MESSAGE, username)));
+        ToDo toDo = toDoRepository.findByUserAndId(loggedInUser, toDoId)
+                .orElseThrow(() -> new ResourceNotFoundException("The To-Do was not found."));
+        toDo.changeStatus();
+        return mapToToDoDto(toDoRepository.save(toDo));
+    }
+
+    @Override
+    public ToDoDto updateToDoForCurrentUser(Long toDoId, CreateUpdateToDoDTO updateToDoDTO) {
+        String username = securityUtils.getCurrentUserUsername();
+        User loggedInUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(IUserService.USER_NOT_FOUND_MESSAGE, username)));
+        ToDo toDo = toDoRepository.findByUserAndId(loggedInUser, toDoId)
+                .orElseThrow(() -> new ResourceNotFoundException("The To-Do was not found."));
+        toDo.setTask(updateToDoDTO.getTask());
+        return mapToToDoDto(toDoRepository.save(toDo));
+    }
+
+    @Override
+    public void deleteToDoForCurrentUser(Long toDoId) {
+        String username = securityUtils.getCurrentUserUsername();
+        User loggedInUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(IUserService.USER_NOT_FOUND_MESSAGE, username)));
+        toDoRepository.findByUserAndId(loggedInUser, toDoId)
+                        .ifPresentOrElse(
+                                toDoRepository::delete,
+                                () -> {
+                                    throw new ResourceNotFoundException("The To-Do was not found,");
+                                });
     }
 
     @Override
@@ -48,8 +83,10 @@ public class ToDoServiceImpl implements IToDoService {
 
     private ToDoDto mapToToDoDto(ToDo toDo) {
         return ToDoDto.builder()
+                .id(toDo.getId())
                 .task(toDo.getTask())
                 .owner(toDo.getUser().getUsername())
+                .complete(toDo.isComplete())
                 .build();
     }
 

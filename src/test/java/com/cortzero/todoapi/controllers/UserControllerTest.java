@@ -5,6 +5,7 @@ import com.cortzero.todoapi.dtos.UserDto;
 import com.cortzero.todoapi.security.SecurityConfiguration;
 import com.cortzero.todoapi.services.IUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -38,6 +39,7 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(username = "testuser")
+    @DisplayName("Test updating current user information endpoint")
     void givenAuthenticatedUserAndValidRequest_whenUpdateCurrentUserInformation_returnsOkAndUpdatedUser() throws Exception {
         // Given
         UpdateUserRequest updateUserRequest = UpdateUserRequest.builder()
@@ -60,15 +62,16 @@ public class UserControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updateUserRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userUpdated.firstName").value("First Name Updated"))
-                .andExpect(jsonPath("$.userUpdated.lastName").value("Last Name Updated"))
-                .andExpect(jsonPath("$.userUpdated.email").value("updated@example.com"));
+                .andExpect(jsonPath("$.firstName").value("First Name Updated"))
+                .andExpect(jsonPath("$.lastName").value("Last Name Updated"))
+                .andExpect(jsonPath("$.email").value("updated@example.com"));
 
         verify(userService, times(1)).updateCurrentUserInformation(any(UpdateUserRequest.class));
     }
 
     @Test
     @WithMockUser(username = "testuser")
+    @DisplayName("Test getting current user information endpoint")
     void givenAuthenticatedUser_whenGetCurrentUserInformation__returnsOkAndCurrentUser() throws Exception {
         // Given
         UserDto userDto = UserDto.builder()
@@ -84,9 +87,9 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/account")
                     .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.user.firstName").value("First Name"))
-                .andExpect(jsonPath("$.user.lastName").value("Last Name"))
-                .andExpect(jsonPath("$.user.email").value("test@example.com"));
+                .andExpect(jsonPath("$.firstName").value("First Name"))
+                .andExpect(jsonPath("$.lastName").value("Last Name"))
+                .andExpect(jsonPath("$.email").value("test@example.com"));
     }
 
 }

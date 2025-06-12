@@ -20,16 +20,32 @@ public class ToDoController {
     private final IToDoService toDoService;
 
     @PostMapping
-    public ResponseEntity<Map<String, ToDoDto>> createToDo(@RequestBody @Valid CreateUpdateToDoDTO createToDoDTO) {
+    public ResponseEntity<ToDoDto> createToDo(@RequestBody @Valid CreateUpdateToDoDTO createToDoDTO) {
         return new ResponseEntity<>(
-                Map.of("toDoCreated", toDoService.createToDoForCurrentUser(createToDoDTO)),
+                toDoService.createToDoForCurrentUser(createToDoDTO),
                 HttpStatus.CREATED);
     }
 
+    @PatchMapping("{toDoId}/status")
+    public ResponseEntity<ToDoDto> changeToDoStatus(@PathVariable Long toDoId) {
+        return ResponseEntity.ok(toDoService.changeToDoStatusForCurrentUser(toDoId));
+    }
+
+    @PutMapping("{toDoId}")
+    public ResponseEntity<ToDoDto> updateToDo(@PathVariable Long toDoId, @RequestBody @Valid CreateUpdateToDoDTO createUpdateToDoDTO) {
+        return ResponseEntity.ok(toDoService.updateToDoForCurrentUser(toDoId, createUpdateToDoDTO));
+    }
+
+    @DeleteMapping("{toDoId}")
+    public ResponseEntity<Void> deleteToDo(@PathVariable Long toDoId) {
+        toDoService.deleteToDoForCurrentUser(toDoId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping
-    public ResponseEntity<Map<String, List<ToDoDto>>> getAllToDos() {
+    public ResponseEntity<List<ToDoDto>> getAllToDos() {
         return new ResponseEntity<>(
-                Map.of("toDos", toDoService.getAllToDosForCurrentUser()),
+                toDoService.getAllToDosForCurrentUser(),
                 HttpStatus.OK);
     }
 

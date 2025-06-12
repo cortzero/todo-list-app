@@ -8,6 +8,7 @@ import com.cortzero.todoapi.exceptions.ResourceNotFoundException;
 import com.cortzero.todoapi.repositories.ToDoRepository;
 import com.cortzero.todoapi.repositories.UserRepository;
 import com.cortzero.todoapi.security.SecurityUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,11 +39,12 @@ public class ToDoServiceImplTest {
     private ToDoServiceImpl toDoService;
 
     @Test
+    @DisplayName("Test creating a To-Do task given an authenticated user")
     void givenValidAuthenticatedUser_whenCreateToDoForCurrentUser_shouldSaveToDoAndReturnDTO() {
         // Given
         CreateUpdateToDoDTO createUpdateToDoDTO = giveCreateUpdateToDoDTO();
         User user = giveUserEntity();
-        ToDo toDo = giveToDo(user, "Do something");
+        ToDo toDo = giveToDo(user, "Do something", false);
 
         when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
@@ -58,6 +60,7 @@ public class ToDoServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test creating a To-Do task given a non-existing authenticated user")
     void givenNonExistingUser_whenCreateToDoForCurrentUser_shouldThrowAnException() {
         // Given
         CreateUpdateToDoDTO createUpdateToDoDTO = giveCreateUpdateToDoDTO();
@@ -74,6 +77,49 @@ public class ToDoServiceImplTest {
     }
 
     @Test
+    @DisplayName("Test changing a To-Do task incomplete status to complete given an authenticated user")
+    void givenAuthenticatedUserAndIncompleteToDo_whenChangeToDoStatusForCurrentUser_shouldReturnDtoWithCompleteStatus() {
+        // Given
+        User user = giveUserEntity();
+        ToDo incompleteToDo = giveToDoWithId(1L, user, "Do something", false);
+        ToDo completeToDo = giveToDoWithId(1L, user, "Do something", true);
+
+        when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(toDoRepository.findByUserAndId(user, 1L)).thenReturn(Optional.of(incompleteToDo)); // has complete = false
+        when(toDoRepository.save(any(ToDo.class))).thenReturn(completeToDo); // has complete = true
+
+        // When
+        ToDoDto toDoDto = toDoService.changeToDoStatusForCurrentUser(1L);
+
+        // Then
+        assertNotNull(toDoDto);
+        assertTrue(toDoDto.isComplete());
+    }
+
+    @Test
+    @DisplayName("Test changing a To-Do task complete status to incomplete given an authenticated user")
+    void givenAuthenticatedUserAndCompleteToDo_whenChangeToDoStatusForCurrentUser_shouldReturnDtoWithIncompleteStatus() {
+        // Given
+        User user = giveUserEntity();
+        ToDo completeToDo = giveToDoWithId(1L, user, "Do something", true);
+        ToDo incompleteToDo = giveToDoWithId(1L, user, "Do something", false);
+
+        when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(toDoRepository.findByUserAndId(user, 1L)).thenReturn(Optional.of(completeToDo)); // has complete = true
+        when(toDoRepository.save(any(ToDo.class))).thenReturn(incompleteToDo); // has complete = false
+
+        // When
+        ToDoDto toDoDto = toDoService.changeToDoStatusForCurrentUser(1L);
+
+        // Then
+        assertNotNull(toDoDto);
+        assertFalse(toDoDto.isComplete());
+    }
+
+    @Test
+    @DisplayName("Test getting all To-Do tasks given an authenticated user")
     void givenValidAuthenticatedUser_whenGetAllToDosForCurrentUser_shouldReturnListOfToDoDTOs() {
         // Given
         User user = giveUserEntity();
@@ -94,6 +140,76 @@ public class ToDoServiceImplTest {
         assertEquals("Do task 3", toDoDTOs.get(2).getTask());
     }
 
+    @Test
+    @DisplayName("Test updating a To-Do task given an authenticated user")
+    void givenValidAuthenticatedUser_whenUpdateToDoForCurrentUser_shouldReturnUpdatedToDoDTO() {
+        // Given
+        User user = giveUserEntity();
+        ToDo toDo = giveToDoWithId(1L, user, "Do something", false);
+        ToDo toDoUpdated = giveToDoWithId(1L, user, "New things to do", false);
+        CreateUpdateToDoDTO updateToDoDTO = CreateUpdateToDoDTO.builder()
+                .task("New things to do")
+                .build();
+
+        when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(toDoRepository.findByUserAndId(user, 1L)).thenReturn(Optional.of(toDo));
+        when(toDoRepository.save(any(ToDo.class))).thenReturn(toDoUpdated);
+
+        // When
+        ToDoDto toDoDto = toDoService.updateToDoForCurrentUser(1L, updateToDoDTO);
+
+        // Then
+        assertNotNull(toDoDto);
+        assertEquals("New things to do", toDoDto.getTask());
+    }
+
+    @Test
+    @DisplayName("Test updating a To-Do task given an authenticated user but non-existing To-Do task")
+    void givenNonExistingToDo_whenUpdateToDoForCurrentUser_shouldThrowResourceNotFoundException() {
+        // Given
+        User user = giveUserEntity();
+        CreateUpdateToDoDTO updateToDoDTO = CreateUpdateToDoDTO.builder()
+                .task("New things to do")
+                .build();
+
+        when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(toDoRepository.findByUserAndId(user, 1L)).thenReturn(Optional.empty());
+
+        // Then
+        assertThrows(ResourceNotFoundException.class,
+                () -> toDoService.updateToDoForCurrentUser(1L, updateToDoDTO));
+    }
+
+    @Test
+    @DisplayName("Test deleting a To-Do task given an authenticated user")
+    void givenValidAuthenticatedUser_whenDeleteToDoForCurrentUser_shouldDeleteToDoFromDatabase() {
+        // Given
+        User user = giveUserEntity();
+        ToDo toDoToDelete = giveToDoWithId(1L, user, "Old task", false);
+        when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(toDoRepository.findByUserAndId(user, 1L)).thenReturn(Optional.of(toDoToDelete));
+
+        // Then
+        assertDoesNotThrow(() -> toDoService.deleteToDoForCurrentUser(1L));
+    }
+
+    @Test
+    @DisplayName("Test deleting a To-Do task given an authenticated user and a non-existing To-Do")
+    void givenValidAuthenticatedUserAndNonExistingToDo_whenDeleteToDoForCurrentUser_shouldThrowResourceNotFoundException() {
+        // Given
+        User user = giveUserEntity();
+        ToDo toDoToDelete = giveToDoWithId(1L, user, "Old task", false);
+        when(securityUtils.getCurrentUserUsername()).thenReturn("testuser");
+        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(toDoRepository.findByUserAndId(user, 1L)).thenReturn(Optional.empty());
+
+        // Then
+        assertThrows(ResourceNotFoundException.class, () -> toDoService.deleteToDoForCurrentUser(1L));
+    }
+
     private CreateUpdateToDoDTO giveCreateUpdateToDoDTO() {
         return CreateUpdateToDoDTO.builder()
                 .task("Do something")
@@ -111,10 +227,19 @@ public class ToDoServiceImplTest {
                 .build();
     }
 
-    private ToDo giveToDo(User user, String task) {
+    private ToDo giveToDo(User user, String task, boolean status) {
         return ToDo.builder()
                 .task(task)
-                .completed(false)
+                .complete(status)
+                .user(user)
+                .build();
+    }
+
+    private ToDo giveToDoWithId(Long id, User user, String task, boolean status) {
+        return ToDo.builder()
+                .id(id)
+                .task(task)
+                .complete(status)
                 .user(user)
                 .build();
     }
@@ -122,7 +247,7 @@ public class ToDoServiceImplTest {
     private List<ToDo> giveNToDosForCurrentUser(User user, int n) {
         List<ToDo> toDos = new ArrayList<>();
         for (int i = 0; i < n; i++) {
-            toDos.add(giveToDo(user, "Do task " + (i + 1)));
+            toDos.add(giveToDo(user, "Do task " + (i + 1), false));
         }
         return toDos;
     }

@@ -18,15 +18,15 @@ public class UserController {
     private final IUserService userService;
 
     @PutMapping("account/update")
-    public ResponseEntity<Map<String, UserDto>> updateCurrentUserInformation(@RequestBody UpdateUserRequest requestBody) {
+    public ResponseEntity<UserDto> updateCurrentUserInformation(@RequestBody UpdateUserRequest requestBody) {
         return new ResponseEntity<>(
-                Map.of("userUpdated", userService.updateCurrentUserInformation(requestBody)),
+                userService.updateCurrentUserInformation(requestBody),
                 HttpStatus.OK);
     }
 
     @GetMapping("account")
-    public ResponseEntity<Map<String, UserDto>> getCurrentUserInformation() {
-        return new ResponseEntity<>(Map.of("user", userService.getCurrentUserInformation()), HttpStatus.OK);
+    public ResponseEntity<UserDto> getCurrentUserInformation() {
+        return new ResponseEntity<>(userService.getCurrentUserInformation(), HttpStatus.OK);
     }
 
 }
