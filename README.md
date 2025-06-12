@@ -6,6 +6,9 @@ This is a REST API where registered users can create, view, edit, delete and che
 - Log in using username and password.
 - Create To-Do tasks.
 - View the list of To-Do tasks create.
+- Change a To-Do task status.
+- Update To-Do task.
+- Delete To-Do task.
 
 ## Technologies
 - Java 17
@@ -34,7 +37,7 @@ cd todo-list-app
 2. Set up environment variables.
 Create a `.env` file in the project root or set the following environment variables in your system:
 ```env
-SPRING_PROFILES_ACTIVE=dev
+SPRING_PROFILES_ACTIVE=profile
 DEV_DATABASE_URL=jdbc:postgresql://localhost:5432/to_do_db_dev
 TEST_DATABASE_URL=jdbc:postgresql://localhost:5432/to_do_db_test
 PROD_DATABASE_URL=jdbc:postgresql://localhost:5432/to_do_db_prod
@@ -63,8 +66,11 @@ The application will start on `http://localhost:8080`.
 - **Update user information**: `PUT /api/users/account/update`
 
 ### To-Do management
-- **Create To-Do**: `POST /api/todos`
+- **Create a To-Do task**: `POST /api/todos`
 - **Get all To-Do tasks**: `GET /api/todos`
+- **Change a To-Do task status**: `PATCH /api/todos/{toDoId}/status`
+- **Update a To-Do task**: `PUT /api/todos/{toDoId}`
+- **Delete a To-Do task**: `DELETE /api/todos/{toDoId}`
 
 Note: All `/api/todos` and `/api/users/account` endpoints require a valid Basic HTTP credentials in the Authorization header.
 
